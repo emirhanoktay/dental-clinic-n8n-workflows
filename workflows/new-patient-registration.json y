@@ -1,0 +1,339 @@
+Tamam, şimdi taşlar yerine oturdu! Kesinlikle haklısın, anladım.
+
+Şu an ekranda gördüğün o boş siyah alana (Enter file contents here yazan yere), biraz önce sana verdiğim **`new-patient-registration.json`** kodunun **tamamını** kopyalayıp yapıştıracaksın.
+
+Hemen aşağıda kopyalaman için o kod tekrar yer alıyor. Bunu tamamen kopyala, oradaki kutuya yapıştır ve sağ üstteki yeşil **"Commit changes..."** butonuna bas. Eski ana dizindeki dosyayı da sildiğinde bu iş tamamdır!
+
+```json
+{
+  "name": "New Patient Registration",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "com.twilio.messaging.inbound-message.received"
+        ]
+      },
+      "type": "n8n-nodes-base.twilioTrigger",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        16
+      ],
+      "id": "451f1890-6b15-415d-be8e-6cb6e24d7c14",
+      "name": "Twilio Trigger",
+      "webhookId": "ca45fd2e-057d-4715-a4d1-c505b05097f3",
+      "credentials": {
+        "twilioApi": {
+          "id": "YOUR_TWILIO_CREDENTIAL_ID",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "=+14155238886",
+        "to": "={{ $json.data.from }}",
+        "toWhatsapp": true,
+        "message": "={{ $json.output }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        592,
+        -112
+      ],
+      "id": "5b7a84b9-e518-4101-b892-3360c2091b4b",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "YOUR_TWILIO_CREDENTIAL_ID",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=={{ $json.data.body }}\n",
+        "options": {
+          "systemMessage": "You are the AI receptionist of White Dent Dental Clinic. Your assistant name is \"Teethy\".\nGreeting: \"Hello, I am Teethy, the White Dent AI assistant. How can I help you?\"\nConversation flow:\n\nIf the patient wants to book an appointment, ask for their complaint/symptom.\nAfter learning the complaint, ask which day and time they would like to come.\nOnce the patient selects a slot, ask for their first name, last name, and phone number.\nAfter gathering the info, create the appointment in Calendar and confirm.\n\nPrice list:\n\nExamination: 500 TL\nImplant: 3000 TL\nX-Ray: 700 TL\nTeeth Cleaning: 650 TL\nExtraction: 1000 TL\n\nClinic info:\n\nWorking hours: Monday-Saturday 09:00-18:00\nClosed on Sundays\nAppointment duration is typically 1 hour\n\nRules:\n\nKeep it short and natural, not robotic\nWrite in English\nDo not use emojis\nDo not assume gender, address as \"you\"\nDo not repeat the same question\nAsk details one by one, not all at once\nIf a question outside the list comes up, say \"You can call our clinic for detailed information\"\nWhen creating appointments, provide start_time and end_time in ISO 8601 format. Example: 2026-05-26T10:00:00+03:00\nToday is Monday, May 25, 2026`\n\n\nCancellation scenario:\n\nWhen a patient wants to cancel, ask which appointment they want to cancel.\nDelete the appointment from Calendar.\nSend a notification email to the doctor via Gmail, subject: \"Appointment Cancellation\", message: write the patient's name and cancelled appointment time.\nThen ask the patient \"Would you like to book an appointment for another day?\"\nIf the patient previously stated their complaint, do not ask again when booking the new appointment; ask directly for the day and time.\nIf the patient previously provided their name, last name, and phone number, reuse them directly."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        48,
+        -112
+      ],
+      "id": "30b9fcf9-a760-4c1d-8584-23756c5263ce",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-6",
+          "cachedResultName": "Claude Sonnet 4.6"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.5,
+      "position": [
+        -128,
+        192
+      ],
+      "id": "2b7f112b-01df-4206-9c5c-a17b918045d1",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "YOUR_ANTHROPIC_CREDENTIAL_ID",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "primary"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        304
+      ],
+      "id": "140e8471-3826-4365-a5c7-1d82eb428529",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "YOUR_GOOGLE_CALENDAR_CREDENTIAL_ID",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=={{ $('Twilio Trigger').item.json.data.from }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.6,
+      "position": [
+        32,
+        192
+      ],
+      "id": "86c272af-27c7-49f9-869f-e892f3e9cdb6",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "YOUR_REDIS_CREDENTIAL_ID",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "257c04be-aee1-4567-8b29-de751f3586d8",
+              "leftValue": "=={{ $json.data.eventName }}\n",
+              "rightValue": "inbound",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -240,
+        16
+      ],
+      "id": "893b165c-3bbc-456a-b870-e55547e7c6c3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "primary"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        304
+      ],
+      "id": "3454e852-60e5-4edb-9a9f-21faa6446537",
+      "name": "Delete an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "YOUR_GOOGLE_CALENDAR_CREDENTIAL_ID",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "doctor@clinic.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        304
+      ],
+      "id": "cb4c5a19-1d71-461f-953a-0f9ef7a1f46c",
+      "name": "Send a message in Gmail",
+      "webhookId": "53f32a70-7be6-4822-9f32-0694a9b871ae",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Twilio Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "de9fca3b-f2c7-4ce2-bccb-7719cad05b6b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "public-portfolio-instance"
+  },
+  "nodeGroups": [],
+  "id": "dental-ai-receptionist",
+  "tags": []
+}
+
+```
