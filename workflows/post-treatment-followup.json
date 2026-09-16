@@ -1,0 +1,143 @@
+{
+  "name": "Post-Treatment Follow-up",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "50c6fc59-7c8b-406f-9885-71da6ac34d03",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Hasta Listesi",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sayfa1",
+          "cachedResultUrl": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "56593ea7-caba-4f43-835a-23880098b4ae",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst items = $input.all();\nconst bugun = new Date();\nbugun.setHours(0, 0, 0, 0);\n\nconst sonuc = [];\n\nfor (const item of items) {\n  const tarihStr = item.json['Tedavi Tarihi'];\n  if (!tarihStr) continue;\n  \n  const parcalar = tarihStr.trim().split('-');\n  const tedaviTarihi = new Date(parcalar[0], parcalar[1] - 1, parcalar[2]);\n  tedaviTarihi.setHours(0, 0, 0, 0);\n  \n  const fark = Math.round((bugun - tedaviTarihi) / (1000 * 60 * 60 * 24));\n  \n  if (fark === 1 || fark === 2 || fark === 3) {\n    sonuc.push({\n      json: {\n        ...item.json,\n        gun: fark\n      }\n    });\n  }\n}\n\nreturn sonuc;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "a261a98e-56d0-4f66-a4b5-5e1b57c173eb",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "={{ $json['Telefon Numarası '] }}",
+        "toWhatsapp": true,
+        "message": "=={{ $json.gun === 1 ? 'Hello ' + $json['İsim - Soyisim'] + ', how are you feeling after yesterday\\'s treatment? Do you have any complaints?' : $json.gun === 2 ? 'Hello ' + $json['İsim - Soyisim'] + ', 2 days have passed since your treatment. How are you, has your pain subsided?' : 'Hello ' + $json['İsim - Soyisim'] + ', 3 days have passed since your treatment. Is everything going well? Have a nice day!' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "8ae2f027-41fc-412d-8ee2-b0b604a3fd63",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "YOUR_TWILIO_CREDENTIAL_ID",
+          "name": "Twilio account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "public-portfolio-instance"
+  },
+  "nodeGroups": [],
+  "id": "post-treatment-followup",
+  "tags": []
+}
+```[cite: 4]
