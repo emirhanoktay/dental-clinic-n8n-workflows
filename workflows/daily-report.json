@@ -1,0 +1,138 @@
+{
+  "name": "Daily Clinic Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b1de768e-2fae-410a-b926-d2798bfe1c96",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "primary"
+        },
+        "timeMax": "={{ $now.plus({ hours: 24 }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6c0393fa-7cca-4112-8ea6-32ba07ff20d0",
+      "name": "Get many events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "YOUR_GOOGLE_CALENDAR_CREDENTIAL_ID",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nlet liste = '';\nfor (const item of items) {\n  const ozet = item.json.summary;\n  const saat = new Date(item.json.start.dateTime).toLocaleTimeString('tr-TR', {\n    hour: '2-digit',\n    minute: '2-digit',\n    timeZone: 'Europe/Istanbul'\n  });\n  liste += `• ${ozet} - Saat: ${saat}\\n`;\n}\n\nreturn [{\n  json: {\n    mesaj: `Dear Clinic Manager,\\n\\nHere is your schedule for today:\\n\\n${liste}\\nBest regards.`\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "e33643fb-e79f-49b6-9b34-9cb51a25f1e4",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "sendTo": "doctor@clinic.com",
+        "subject": "Daily Clinic Report Summary",
+        "emailType": "text",
+        "message": "={{ $json.mesaj }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "fc4c9ff4-0242-4ca0-86df-09afba82ec98",
+      "name": "Send a message",
+      "webhookId": "8d841323-4e80-442b-9073-301a89bca49d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed"
+  },
+  "versionId": "3925578a-80ed-47ae-969d-f9dcc7756194",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "public-portfolio-instance"
+  },
+  "nodeGroups": [],
+  "id": "daily-clinic-report",
+  "tags": []
+}
