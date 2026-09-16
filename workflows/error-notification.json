@@ -1,0 +1,67 @@
+{
+  "name": "Global Error Notification",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f8c9fd79-6bf1-4a39-a179-3d065962a30c",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "sendTo": "admin@clinic.com",
+        "subject": "=System Error : {{ $json.workflow.name }}",
+        "message": "=`Hello, an error occurred in the {{ $json.workflow.name }} workflow. Error: {{ $json.execution.error.message }}. Please check.`",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c4fcfda2-69e0-4c18-bc2a-c1f9d54bd55f",
+      "name": "Send a message",
+      "webhookId": "3f52ddf6-6b14-4a65-bd41-9eea75d228b0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e93fd34b-71c7-44ea-87c1-f281634c3688",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "public-portfolio-instance"
+  },
+  "nodeGroups": [],
+  "id": "global-error-notification",
+  "tags": []
+}
+```[cite: 5]
