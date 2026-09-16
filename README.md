@@ -1,43 +1,69 @@
-# 🦷 Dental Clinic AI Assistant & Automation Suite
+<img width="4000" height="2000" alt="al cil" src="https://github.com/user-attachments/assets/88b2dd00-421b-4af2-a26d-d1068fea52ae" />
 
-An advanced, production-ready **n8n workflow** designed for dental clinics to automate patient interactions, appointment bookings, cancellations, and notifications using Large Language Models (LLMs).
+
+# 🦷 Dental Clinic Automation & AI Suite
+
+A production-ready collection of **n8n workflows** designed to automate dental clinic operations, patient relationship management (CRM), appointment scheduling, and administrative reporting using AI agents and third-party APIs.
 
 ---
 
-## 🚀 What This Workflow Does (`New Patient Registration`)
+## 🚀 Included Workflows & Architecture
 
-This automated AI receptionist named **"Teethy"** handles inbound patient messaging via WhatsApp/SMS through Twilio, guiding them through a natural conversation flow:
+### 1. New Patient Registration (`/workflows/new-patient-registration.json`)
+* **What it does:** An AI-powered receptionist named **"Teethy"** that handles inbound patient messaging via WhatsApp/SMS through Twilio.
+* **Key Features:** 
+  - **Smart conversation engine:** Conducts natural conversations regarding symptoms, pricing, and clinic hours via Claude.
+  - **Real-time schedule sync:** Automatically books or cancels appointments in Google Calendar.
+  - **Instant failure alerts:** Sends immediate cancellation alerts to doctors via Gmail.
+* **Tech Stack:** Anthropic Claude (LLM), Twilio, Google Calendar, Redis (Chat Memory), Gmail.
 
-1. **Inbound Trigger:** Listens for incoming patient messages via Twilio (`Twilio Trigger`).
-2. **AI Agent & LLM Integration:** Powered by Claude (Anthropic), the AI agent manages the conversation context, pricing information, and clinic working hours.
-3. **Smart Conversation Flow:**
-   - Asks for the patient's complaint/symptom.
-   - Requests preferred day and time slots.
-   - Collects personal details (First Name, Last Name, Phone Number).
-4. **Calendar & Notification Management:**
-   - Automatically creates or deletes appointments in **Google Calendar**.
-   - Sends cancellation or booking notifications to the doctor via **Gmail**.
-5. **Session Memory:** Uses **Redis Chat Memory** to track conversation states seamlessly across multiple interactions per user.
+### 2. Appointment Reminders (`/workflows/appointment-reminder.json`)
+* **What it does:** A scheduled background job that checks upcoming calendar events and dispatches 24-hour reminder messages to patients.
+* **Key Features:**
+  - **Autonomous background tasks:** Automatically cross-references calendar events with patient records stored in Google Sheets.
+  - **Dynamic data logging:** Logs notification statuses to keep track of communication history.
+* **Tech Stack:** Schedule Trigger, Google Calendar, Google Sheets, Twilio (WhatsApp/SMS).
+
+### 3. Daily Clinic Report (`/workflows/daily-report.json`)
+* **What it does:** Generates and emails a structured daily schedule summary to the clinic manager or doctor every morning.
+* **Key Features:**
+  - Fetches all scheduled events for the upcoming 24 hours.
+  - **Custom data transformation:** Parses and formats event times and details cleanly using custom JavaScript code.
+* **Tech Stack:** Schedule Trigger, Google Calendar, JavaScript Code Node, Gmail.
+
+### 4. Post-Treatment Follow-up (`/workflows/post-treatment-followup.json`)
+* **What it does:** Automatically tracks patient treatment dates from a database and sends personalized check-in messages on the 1st, 2nd, and 3rd days following a procedure.
+* **Key Features:**
+  - **Milestone tracking:** Dynamic date-diff calculations to trigger milestone-based care messages.
+  - Automated multi-day conditional messaging via WhatsApp.
+* **Tech Stack:** Schedule Trigger, Google Sheets, JavaScript Code Node, Twilio.
+
+### 5. Global Error Notification (`/workflows/error-notification.json`)
+* **What it does:** A robust error-handling mechanism that catches failures across any workflow in the suite.
+* **Key Features:**
+  - **Zero-downtime protection:** Instantly alerts administrators via email with the exact workflow name and error message when something goes wrong.
+* **Tech Stack:** Error Trigger, Gmail.
 
 ---
 
 ## 🛠️ Tech Stack & Integrations
-* **Automation Engine:** n8n (Self-hosted / Cloud)
-* **AI Model:** Anthropic Claude Sonnet via LangChain AI Agent nodes
-* **Messaging:** Twilio (WhatsApp / SMS API)
-* **Database & Memory:** Redis
-* **Productivity & Sync:** Google Calendar API & Gmail API
+* **Automation Engine:** n8n
+* **AI & LLMs:** Anthropic Claude (Sonnet) via LangChain
+* **Messaging & Communication:** Twilio (WhatsApp & SMS API)
+* **Database & Memory:** Google Sheets & Redis
+* **Productivity & Workspace:** Google Calendar API & Gmail API
 
 ---
 
 ## 📦 How to Import & Use
 
-1. Download the [`new-patient-registration.json`](./workflows/new-patient-registration.json) file from the `workflows/` directory.
-2. Open your n8n dashboard and import the JSON file.
+1. Clone or download this repository.
+2. Import any JSON file from the `workflows/` directory into your n8n instance.
 3. Configure your own credentials:
-   - **Twilio API**
-   - **Anthropic (Claude) API**
-   - **Google Calendar OAuth2 API**
-   - **Redis Account**
-   - **Gmail OAuth2 API**
-4. Activate your workflow and link your Twilio webhook endpoint!
+   - Twilio API
+   - Anthropic (Claude) API
+   - Google Calendar, Sheets, and Gmail OAuth2 APIs
+   - Redis Account
+4. Activate your workflows and update the webhook endpoints accordingly.
+
+
