@@ -3,7 +3,7 @@
 
 # 🦷 Dental Clinic Automation & AI Suite
 
-A production-ready collection of **n8n workflows** designed to automate dental clinic operations, patient relationship management (CRM), appointment scheduling, and administrative reporting using AI agents and third-party APIs.
+A working reference build of **n8n workflows** designed to automate dental clinic operations, patient relationship management (CRM), appointment scheduling, and administrative reporting using AI agents and third-party APIs.
 
 ---
 
@@ -66,4 +66,11 @@ A production-ready collection of **n8n workflows** designed to automate dental c
    - Redis Account
 4. Activate your workflows and update the webhook endpoints accordingly.
 
+---
 
+## ⚠️ Limitations
+
+* **Reference build, not a deployed product.** These workflows were built and demonstrated as a portfolio/reference system; no clinic runs them in production.
+* **Placeholders.** Credential IDs, calendar/sheet IDs and e-mail addresses (`doctor@clinic.com`, `admin@clinic.com`) are placeholders. The phone number in the Twilio nodes is Twilio's public sandbox number.
+* **Patient data.** Handling of real patient data (e.g. KVKK/GDPR consent, retention, logging) has not been reviewed. Do that before using this with real patients.
+* **Prompts and pricing.** The "Teethy" prompt, clinic hours and price answers are sample content and must be replaced with the clinic's real information.
